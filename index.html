@@ -24,6 +24,11 @@ footer{background:var(--navy);color:var(--white);padding-block:24px}footer .wrap
 @media(max-width:760px){.wrap{width:calc(100% - 38px)}.chalet-grid{grid-template-columns:1fr;gap:24px}.travel{grid-template-columns:1fr}.chalet-grid img{aspect-ratio:1.64}.section{padding-block:50px}.hero{min-height:510px}.hero img{object-position:58% center}.hero::after{background:linear-gradient(90deg,rgba(10,31,46,.88),rgba(10,31,46,.42) 83%)}} 
 @media(max-width:530px){.bar .wrap{display:block;padding-top:11px}.bar ul{gap:6px;padding:8px 0}.bar li a{font-size:.82rem;padding:0 8px}.hero{min-height:452px}.hero-content{padding-block:42px 59px}.hero p{font-size:.97rem}.facts a{padding:12px 7px}.facts .tag{letter-spacing:.085em}.prep-grid,.notes-grid{grid-template-columns:1fr}.plan-list li{grid-template-columns:minmax(102px,.95fr) minmax(0,1.4fr);padding:11px 12px;gap:8px}.plan-list time{font-size:.88rem}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+.hero-actions{display:flex;flex-wrap:wrap;align-items:center;gap:12px 16px}
+.countdown{display:grid;gap:1px;padding:6px 12px;border:1px solid #e2edf09c;border-radius:8px;background:#102838d9}
+.countdown[hidden]{display:none}
+.countdown-value{color:var(--gold);font-size:1.15rem;font-weight:800;line-height:1.2;font-variant-numeric:tabular-nums}
+.countdown-label{color:#f2f5f7;font-size:.72rem}
 </style>
 </head>
 <body>
@@ -54,7 +59,13 @@ footer{background:var(--navy);color:var(--white);padding-block:24px}footer .wrap
       <span class="tag">20 t/m 27 februari · Oostenrijk</span>
       <h1 id="titel">Kleinarl <span class="year">2027</span></h1>
       <p>Met vrienden de sneeuw in. Overdag de piste op, ’s avonds met z’n allen aan tafel in Chalet Tanne.</p>
-      <a class="button sun" href="#chalet">Bekijk onze week <svg class="arrow" aria-hidden="true"><use href="#arrow-down"/></svg></a>
+      <div class="hero-actions">
+        <a class="button sun" href="#chalet">Bekijk onze week <svg class="arrow" aria-hidden="true"><use href="#arrow-down"/></svg></a>
+        <div class="countdown" id="countdown" hidden>
+          <span class="countdown-value" id="countdown-value"></span>
+          <span class="countdown-label">Tot Kleinarl · <time datetime="2027-02-20">20 februari 2027</time></span>
+        </div>
+      </div>
     </div>
     <a class="photo-credit" href="https://www.alpin-chalet.com/en/large/">Foto’s Kleinarl · Alpin Chalet</a>
   </section>
@@ -180,6 +191,26 @@ footer{background:var(--navy);color:var(--white);padding-block:24px}footer .wrap
   <a href="#boven">Terug naar boven <svg class="arrow" aria-hidden="true"><use href="#arrow-up"/></svg></a>
 </div></footer>
 <script>
+const countdown = document.getElementById('countdown');
+const countdownValue = document.getElementById('countdown-value');
+const departure = Date.parse(countdown.querySelector('time').dateTime);
+const amsterdamDate = new Intl.DateTimeFormat('nl-NL', {
+  timeZone: 'Europe/Amsterdam', year: 'numeric', month: 'numeric', day: 'numeric'
+});
+
+function updateCountdown() {
+  const parts = amsterdamDate.formatToParts(new Date());
+  const year = Number(parts.find(part => part.type === 'year').value);
+  const month = Number(parts.find(part => part.type === 'month').value);
+  const day = Number(parts.find(part => part.type === 'day').value);
+  const daysLeft = (departure - Date.UTC(year, month - 1, day)) / 86_400_000;
+  countdown.hidden = daysLeft < 0;
+  countdownValue.textContent = daysLeft === 0 ? 'Vandaag begint onze wintersport!' :
+    daysLeft === 1 ? 'Nog 1 dag' : `Nog ${daysLeft} dagen`;
+}
+updateCountdown();
+setInterval(updateCountdown, 60_000);
+
 // Plak hier de gedeelde iCloud-link voor de boodschappen- en spelletjeslijst.
 const gedeeldeNotitie = "https://www.icloud.com/notes/072MYbLXx_vHDHut1VKbiVl0Q#Wintersport_Kleinarl_2027_(kopie_van_2026)";
 if (gedeeldeNotitie) {
